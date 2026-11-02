@@ -1,0 +1,5 @@
+{
+  // use the TypeScript the client is built with, not the (newer) one bundled in VS Code
+  "typescript.tsdk": "client/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Delete Scene
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/scenes/:scene_id
+  body: none
+  auth: none
+}
+
+params:path {
+  scene_id: {{sceneId}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Device with its endpoints and clusters
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/devices/:device_id
+  body: none
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}

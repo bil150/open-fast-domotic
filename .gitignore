@@ -1,0 +1,53 @@
+# dependencies and build output
+node_modules/
+dist/
+build/
+.venv/
+
+# python tooling caches
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# local state: Zigbee network key + paired devices, databases, logs
+.env
+server/persistence/*
+!server/persistence/.gitkeep
+*.log
+*.log.*
+*.db
+*.db-shm
+*.db-wal
+
+# editors / OS
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# env files (keep the examples)
+.env.*
+!.env.example
+!.env.local.example
+!.env.development
+
+# test / build artefacts
+coverage/
+.coverage
+htmlcov/
+*.tsbuildinfo
+*.egg-info/
+
+# local scratch
+*.bak
+*.tmp
+
+# backups and exports: they hold the Zigbee network key (sh docker.sh backup, zigpy network export)
+*.tgz
+ofd-backup-*
+network*.json
+
+# old cache of the animations
+animations_cache*.json
+

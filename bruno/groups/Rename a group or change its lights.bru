@@ -1,0 +1,24 @@
+meta {
+  name: Rename a group or change its lights
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/groups/:zone_id
+  body: json
+  auth: none
+}
+
+params:path {
+  zone_id: {{zoneId}}
+}
+
+body:json {
+  {
+    "name": "Ceiling lights",
+    "device_ids": [
+      "{{deviceId}}"
+    ]
+  }
+}

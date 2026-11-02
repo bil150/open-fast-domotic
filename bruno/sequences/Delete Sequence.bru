@@ -1,0 +1,15 @@
+meta {
+  name: Delete Sequence
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/sequences/:sequence_id
+  body: none
+  auth: none
+}
+
+params:path {
+  sequence_id: {{sequenceId}}
+}

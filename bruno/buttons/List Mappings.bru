@@ -1,0 +1,15 @@
+meta {
+  name: List Mappings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/buttons
+  body: none
+  auth: none
+}
+
+params:query {
+  device_id: string
+}

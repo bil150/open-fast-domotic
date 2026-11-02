@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "open-fast-domotic",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

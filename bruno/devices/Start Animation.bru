@@ -1,0 +1,34 @@
+meta {
+  name: Start Animation
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/devices/:device_id/animation
+  body: json
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}
+
+body:json {
+  {
+    "keys": [
+      {
+        "hue": 0,
+        "saturation": 100,
+        "brightness": 255,
+        "transition_time": 10
+      },
+      {
+        "hue": 120,
+        "saturation": 100,
+        "brightness": 255,
+        "transition_time": 10
+      }
+    ]
+  }
+}

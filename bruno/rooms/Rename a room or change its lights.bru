@@ -1,0 +1,24 @@
+meta {
+  name: Rename a room or change its lights
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/rooms/:zone_id
+  body: json
+  auth: none
+}
+
+params:path {
+  zone_id: {{zoneId}}
+}
+
+body:json {
+  {
+    "name": "Living room",
+    "device_ids": [
+      "{{deviceId}}"
+    ]
+  }
+}

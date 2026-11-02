@@ -1,0 +1,15 @@
+meta {
+  name: Toggle
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/devices/:device_id/toggle
+  body: none
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}

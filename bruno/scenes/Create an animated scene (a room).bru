@@ -1,0 +1,38 @@
+meta {
+  name: Create an animated scene (a room)
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/scenes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Slow rainbow",
+    "animated": true,
+    "target": {
+      "type": "room",
+      "id": {{zoneId}}
+    },
+    "palette": [
+      {
+        "hex_color": "#ff0000"
+      },
+      {
+        "hex_color": "#00ff00"
+      },
+      {
+        "hex_color": "#0000ff"
+      }
+    ],
+    "speed": "slow"
+  }
+}
+
+docs {
+  The palette glides over the lights of the room (zoneId). Apply it to start it, Stop to end it.
+}

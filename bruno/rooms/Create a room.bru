@@ -1,0 +1,20 @@
+meta {
+  name: Create a room
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/rooms
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Living room",
+    "device_ids": [
+      "{{deviceId}}"
+    ]
+  }
+}

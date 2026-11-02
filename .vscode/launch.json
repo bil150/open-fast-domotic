@@ -1,0 +1,64 @@
+{
+  // F5 with "Server + Client" starts everything. The Python interpreter is the one selected
+  // in VS Code (Ctrl+Shift+P > "Python: Select Interpreter"): pick the server/.venv one.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Server",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"],
+      "cwd": "${workspaceFolder}/server",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Server (no dongle)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"],
+      "cwd": "${workspaceFolder}/server",
+      "env": { "ENABLE_ZIGBEE": "false" },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Server tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "cwd": "${workspaceFolder}/server",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Client",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/client"
+    },
+    {
+      "name": "Client in Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/client/src"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Server + Client",
+      "configurations": ["Server", "Client"],
+      "stopAll": true
+    },
+    {
+      "name": "Server (no dongle) + Client",
+      "configurations": ["Server (no dongle)", "Client"],
+      "stopAll": true
+    }
+  ]
+}

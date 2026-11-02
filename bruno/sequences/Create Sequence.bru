@@ -1,0 +1,26 @@
+meta {
+  name: Create Sequence
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/sequences
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Day",
+    "steps": [
+      {
+        "scene_id": {{sceneId}},
+        "duration": 3600,
+        "fade": true
+      }
+    ],
+    "loop": true,
+    "enabled": true
+  }
+}

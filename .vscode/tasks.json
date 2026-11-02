@@ -1,0 +1,37 @@
+{
+  // Ctrl+Shift+B runs "Build": checks, client build and the build/ folder, in one go.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "type": "npm",
+      "script": "build",
+      "detail": "Checks (lint, types, tests), client build, assemble build/",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build (no checks)",
+      "type": "shell",
+      "command": "npm run build -- --skip-checks",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Release (pre-release gates + zip)",
+      "type": "npm",
+      "script": "release",
+      "detail": "Versions, clean git tree, checks, build, zip, archive audit",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check",
+      "type": "npm",
+      "script": "check",
+      "detail": "Lint, types and tests, client and server",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Create Schedule
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/schedules
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Evening light",
+    "cron": "30 18 * * *",
+    "scene_id": {{sceneId}},
+    "enabled": true
+  }
+}

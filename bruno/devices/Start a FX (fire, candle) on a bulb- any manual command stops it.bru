@@ -1,0 +1,22 @@
+meta {
+  name: Start a FX (fire, candle) on a bulb; any manual command stops it
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/devices/:device_id/effect
+  body: json
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}
+
+body:json {
+  {
+    "effect": "fire",
+    "brightness": 255
+  }
+}

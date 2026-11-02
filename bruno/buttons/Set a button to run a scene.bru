@@ -1,0 +1,22 @@
+meta {
+  name: Set a button to run a scene
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/buttons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "device_id": "{{buttonId}}",
+    "event": "on_off.toggle",
+    "action": {
+      "type": "scene",
+      "scene_id": {{sceneId}}
+    }
+  }
+}

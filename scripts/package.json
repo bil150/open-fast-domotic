@@ -1,0 +1,11 @@
+{
+    "name": "open-fast-domotic-scripts",
+    "version": "--",
+    "private": true,
+    "scripts": {
+      "generate-licenses": "node generate_licenses.js"
+    },
+    "devDependencies": {
+      "license-checker": "^25.0.1"
+    }
+}

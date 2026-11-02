@@ -1,0 +1,26 @@
+meta {
+  name: Set what a button event triggers
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/buttons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "device_id": "{{buttonId}}",
+    "event": "on_off.toggle",
+    "action": {
+      "type": "toggle",
+      "device_id": "{{deviceId}}"
+    }
+  }
+}
+
+docs {
+  One action per (device_id, event). The events a button emitted are in its state.last_button.
+}

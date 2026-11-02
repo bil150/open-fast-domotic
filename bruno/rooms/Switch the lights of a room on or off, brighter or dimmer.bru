@@ -1,0 +1,21 @@
+meta {
+  name: Switch the lights of a room on or off, brighter or dimmer
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/rooms/:zone_id/light
+  body: json
+  auth: none
+}
+
+params:path {
+  zone_id: {{zoneId}}
+}
+
+body:json {
+  {
+    "power": true
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: The FX running on a bulb, if any
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/devices/:device_id/effect
+  body: none
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}

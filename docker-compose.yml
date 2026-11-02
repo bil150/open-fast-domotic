@@ -1,0 +1,32 @@
+# The dongle plugged in the host is mounted in the container. On Windows: through WSL2, see the README.
+name: open-fast-domotic
+
+services:
+  # the API, the only one to talk to the Zigbee dongle
+  server:
+    container_name: open-fast-domotic-server
+    build: ./server
+    restart: unless-stopped
+    devices:
+      # host device of the Zigbee dongle (find it with: ls /dev/ttyUSB* /dev/ttyACM*)
+      - "${Z_DONGLE_DEVICE:-/dev/ttyUSB0}:/dev/ttyUSB0"
+    # the .env next to this file, as is (see .env.example). .env.local is not loaded: it is for the dev machine
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      # Zigbee network key + paired devices, the server database and its log
+      - data:/data
+
+  # the web application, and the entry point: http://localhost:8000
+  client:
+    container_name: open-fast-domotic-client
+    build: ./client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "8000:80"
+
+volumes:
+  data:

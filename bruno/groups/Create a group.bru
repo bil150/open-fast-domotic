@@ -1,0 +1,20 @@
+meta {
+  name: Create a group
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/groups
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Ceiling lights",
+    "device_ids": [
+      "{{deviceId}}"
+    ]
+  }
+}

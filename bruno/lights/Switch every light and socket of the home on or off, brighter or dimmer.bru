@@ -1,0 +1,17 @@
+meta {
+  name: Switch every light and socket of the home on or off, brighter or dimmer
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/lights
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "power": true
+  }
+}

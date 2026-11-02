@@ -1,0 +1,10 @@
+fastapi==0.115.2
+uvicorn[standard]==0.54.0
+websockets==17.2
+pydantic==2.9.2
+pydantic-settings==2.16.0
+sqlalchemy[asyncio]==2.1.5
+aiosqlite==0.20.0
+croniter==6.2.4
+zigpy==0.67.0
+zigpy-znp==0.12.4

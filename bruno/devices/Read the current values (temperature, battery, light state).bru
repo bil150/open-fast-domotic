@@ -1,0 +1,19 @@
+meta {
+  name: Read the current values (temperature, battery, light state)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/devices/:device_id/refresh
+  body: none
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}
+
+docs {
+  Sleeping sensors and buttons only answer while awake: press the device's button just before calling.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Rename Device
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/devices/:device_id
+  body: json
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}
+
+body:json {
+  {
+    "name": "Living room lamp"
+  }
+}

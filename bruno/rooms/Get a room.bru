@@ -1,0 +1,15 @@
+meta {
+  name: Get a room
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/rooms/:zone_id
+  body: none
+  auth: none
+}
+
+params:path {
+  zone_id: {{zoneId}}
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Power, brightness, color or white
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/devices/:device_id/light
+  body: json
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}
+
+body:json {
+  {
+    "power": true,
+    "brightness": 200,
+    "hex_color": "#ff8800",
+    "transition_time": 2
+  }
+}

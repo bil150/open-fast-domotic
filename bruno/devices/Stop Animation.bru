@@ -1,0 +1,15 @@
+meta {
+  name: Stop Animation
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/devices/:device_id/animation
+  body: none
+  auth: none
+}
+
+params:path {
+  device_id: {{deviceId}}
+}

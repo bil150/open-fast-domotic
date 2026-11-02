@@ -1,0 +1,37 @@
+{
+  "name": "open-fast-domotic",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local home automation hub: Python (FastAPI, zigpy-znp) server and React (Vite) client.",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "fade-test": "node scripts/fade-test.mjs",
+    "dev": "concurrently --kill-others --names server,client --prefix-colors blue,green \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "node scripts/python.mjs -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000 --reload",
+    "dev:client": "npm --prefix client run dev",
+    "build": "node scripts/build.mjs",
+    "release": "node scripts/build.mjs --release",
+    "start": "npm run build:client && cross-env STATIC_DIR=../client/dist node scripts/python.mjs -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000",
+    "format": "node scripts/python.mjs -m ruff format .",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "npm --prefix client run lint",
+    "lint:server": "node scripts/python.mjs -m ruff check .",
+    "typecheck": "npm run typecheck:client && npm run typecheck:server",
+    "typecheck:client": "npm --prefix client run typecheck",
+    "typecheck:server": "node scripts/python.mjs -m mypy",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "npm --prefix client run test",
+    "test:server": "node scripts/python.mjs -m pytest -q",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "build:client": "npm --prefix client run build"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.6.1",
+    "concurrently": "^10.0.6",
+    "cross-env": "^10.1.0"
+  }
+}

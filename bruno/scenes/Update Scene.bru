@@ -1,0 +1,30 @@
+meta {
+  name: Update Scene
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/scenes/:scene_id
+  body: json
+  auth: none
+}
+
+params:path {
+  scene_id: {{sceneId}}
+}
+
+body:json {
+  {
+    "name": "Evening",
+    "actions": [
+      {
+        "device_id": "{{deviceId}}",
+        "power": true,
+        "brightness": 150,
+        "color_temp_kelvin": 2700,
+        "transition_time": 2
+      }
+    ]
+  }
+}

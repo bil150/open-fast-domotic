@@ -1,0 +1,23 @@
+meta {
+  name: Set a button to switch a device
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/buttons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "device_id": "{{buttonId}}",
+    "event": "on_off.on",
+    "action": {
+      "type": "power",
+      "device_id": "{{deviceId}}",
+      "state": true
+    }
+  }
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Create Scene
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/scenes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Evening",
+    "actions": [
+      {
+        "device_id": "{{deviceId}}",
+        "power": true,
+        "brightness": 150,
+        "color_temp_kelvin": 2700,
+        "transition_time": 2
+      }
+    ]
+  }
+}

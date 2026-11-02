@@ -1,0 +1,15 @@
+meta {
+  name: Apply a scene (an animated scene starts looping)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/scenes/:scene_id/apply
+  body: none
+  auth: none
+}
+
+params:path {
+  scene_id: {{sceneId}}
+}
