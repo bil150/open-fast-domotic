@@ -2,7 +2,7 @@ import pytest
 from zigpy.zcl import foundation
 
 from app.protocols.base import Capability, LightCommand, device_type_from_capabilities
-from app.protocols.zigbee.device import (
+from app.protocols.z.device import (
     COLOR,
     LEVEL_CONTROL,
     ON_OFF,

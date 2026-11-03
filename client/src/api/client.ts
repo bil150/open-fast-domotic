@@ -16,7 +16,8 @@ import {
   ZoneInput,
 } from "./types";
 
-// Empty in production: the server serves the client. In dev, the root .env.development points to the API.
+// Empty by default: the API is on the same origin (the server serves the client; nginx and the Vite proxy forward /api).
+// Set VITE_API_URL in the .env to call an API elsewhere.
 const ORIGIN = import.meta.env.VITE_API_URL ?? "";
 export const API_BASE = `${ORIGIN}/api/v1`;
 
@@ -98,6 +99,8 @@ export const api = {
   },
   devices: {
     list: async (): Promise<Device[]> => (await request<{ devices: Device[] }>("/devices")).devices,
+    /** Off the network, and forgotten by the server (rooms, groups, scenes, buttons...). */
+    remove: (id: string) => requestNoContent(`/devices/${enc(id)}`, json("DELETE")),
     rename: (id: string, name: string | null) =>
       request<Device>(`/devices/${enc(id)}`, json("PATCH", { name })),
     light: (id: string, body: LightRequest) =>

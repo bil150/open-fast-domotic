@@ -17,9 +17,9 @@ Usage: sh docker.sh <command>
   status                show the container
   logs                  follow the log
   update                rebuild after replacing server/ and client/ with a newer build
-  backup [file.tgz]     save the data (Zigbee network key, devices, scenes...) to a file
+  backup [file.tgz]     save the data (radio network key, devices, scenes...) to a file
   restore <file.tgz>    replace the data with a backup (the file must be in this folder)
-  import-network <app.db>   start from an existing Zigbee database (keeps your paired devices)
+  import-network <app.db>   start from an existing radio database (keeps your paired devices)
 EOF
 }
 

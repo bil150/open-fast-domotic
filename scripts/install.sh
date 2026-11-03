@@ -2,7 +2,7 @@
 # Guided installation of open-fast-domotic (Linux/macOS).
 #
 #   sh install.sh               with Docker (recommended): .env, image, start
-#   sh install.sh --no-docker   with Python: virtual environment, dependencies, .env.local
+#   sh install.sh --no-docker   with Python: virtual environment, dependencies, .env
 #   sh install.sh --yes         no question, take the detected values
 #   sh install.sh --force       overwrite an existing .env
 set -eu
@@ -92,15 +92,20 @@ else
   .venv/bin/python -m pip install --quiet -r server/requirements.txt
   echo "Installed in .venv"
 
-  say "Settings (.env.local)"
+  say "Settings (.env)"
   dongle=""
-  if [ -f .env.local ] && [ "$FORCE" = 0 ]; then
-    echo ".env.local already exists: kept (use --force to rewrite it)."
+  [ -f .env ] || cp .env.example .env
+  if grep -q '^Z_DONGLE_PATH=' .env && [ "$FORCE" = 0 ]; then
+    echo ".env already has a Z_DONGLE_PATH: kept (use --force to change it)."
   else
     dongle="$(ask 'Dongle device' "$DONGLE_DEFAULT")"
-    printf 'Z_DONGLE_PATH=%s
-' "$dongle" > .env.local
-    echo "Written: .env.local"
+    if grep -q '^Z_DONGLE_PATH=' .env; then
+      sed "s|^Z_DONGLE_PATH=.*|Z_DONGLE_PATH=$dongle|" .env > .env.tmp && mv .env.tmp .env
+    else
+      printf 'Z_DONGLE_PATH=%s
+' "$dongle" >> .env
+    fi
+    echo "Written: .env (Z_DONGLE_PATH=$dongle)"
   fi
   if [ -n "$dongle" ]; then
     echo "Note: your user must be allowed to open the dongle: sudo usermod -aG dialout \$USER (then log in again)."

@@ -5,8 +5,8 @@ import pytest
 
 from app.core.config import Settings
 from app.protocols.base import DeviceEvent, LightCommand
-from app.protocols.zigbee.coordinator import ZigbeeCoordinator, _ClusterListener
-from app.protocols.zigbee.device import (
+from app.protocols.z.coordinator import ZCoordinator, _ClusterListener
+from app.protocols.z.device import (
     COLOR,
     LEVEL_CONTROL,
     ON_OFF,
@@ -30,7 +30,7 @@ class FakeMeta:
 
 
 def make(devices):
-    coordinator = ZigbeeCoordinator(Settings(enable_zigbee=False, _env_file=None), FakeMeta())
+    coordinator = ZCoordinator(Settings(enable_z=False, _env_file=None), FakeMeta())
     coordinator.app = SimpleNamespace(
         devices={d.ieee: d for d in devices},
         permit=None,
@@ -167,7 +167,7 @@ async def test_commands_on_unknown_devices_fail_cleanly():
 async def test_permit_join_requires_the_radio():
     from app.core.errors import RadioNotReadyError
 
-    coordinator = ZigbeeCoordinator(Settings(enable_zigbee=False, _env_file=None), FakeMeta())
+    coordinator = ZCoordinator(Settings(enable_z=False, _env_file=None), FakeMeta())
     with pytest.raises(RadioNotReadyError):
         await coordinator.permit_join(30)
     assert coordinator.info()["ready"] is False
@@ -208,3 +208,21 @@ async def test_a_lamp_is_sent_one_command_at_a_time_in_the_order_they_came():
     assert all(results)
     assert most == 1  # never two exchanges at once on the same lamp
     assert order == [10, 20, 30, 40]  # and in the order they came
+
+
+async def test_remove_device_asks_zigpy_and_hides_it_at_once():
+    zdev, *_ = sensor()
+    coordinator, _ = make([zdev])
+    asked = []
+
+    async def remove(ieee):
+        asked.append(ieee)  # zigpy keeps the device in its list for a few seconds more
+
+    coordinator.app.remove = remove
+    await coordinator.remove_device(IEEE)
+    assert asked == [zdev.ieee]
+    assert not coordinator.owns(IEEE)
+    assert await coordinator.list_devices() == []
+
+    coordinator.device_joined(zdev)  # it is paired again
+    assert coordinator.owns(IEEE)

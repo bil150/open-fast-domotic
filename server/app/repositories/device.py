@@ -31,6 +31,9 @@ class DeviceMetaRepository:
     async def set(self, device_id: str, data: Json) -> None:
         await self.session.merge(DeviceMeta(device_id=device_id, data=data))
 
+    async def delete(self, device_id: str) -> None:
+        await self.session.execute(delete(DeviceMeta).where(DeviceMeta.device_id == device_id))
+
 
 class AnimationRepository:
     def __init__(self, session: AsyncSession) -> None:

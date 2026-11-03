@@ -94,3 +94,44 @@ async def test_discovery_and_coordinator_info(client, fake):
     assert fake.permit_seconds == 45
     assert (await client.post("/coordinator/discovery?seconds=0")).status_code == 422
     assert (await client.get("/coordinator")).json()["coordinators"][0]["protocol"] == "fake"
+
+
+async def test_remove_device_forgets_it_everywhere(client, fake):
+    await client.patch("/devices/socket", json={"name": "Kettle"})
+    room = (await client.post("/rooms", json={"name": "Kitchen", "device_ids": ["socket", "bulb"]})).json()
+    group = (await client.post("/groups", json={"name": "Warm", "device_ids": ["socket", "white"]})).json()
+    scene = {
+        "name": "Evening",
+        "target": {"type": "room", "id": room["id"]},
+        "palette": [{"hex_color": "#ff8800"}],
+        "assignments": {"socket": 0, "bulb": 0},
+        "switches": {"socket": True, "white": False},
+    }
+    scene_id = (await client.post("/scenes", json=scene)).json()["id"]
+    pressed = {"device_id": "button", "event": "on_off.toggle", "action": {"type": "toggle", "device_id": "socket"}}
+    await client.put("/buttons", json=pressed)
+
+    assert (await client.delete("/devices/socket")).status_code == 204
+
+    assert fake.removed == ["socket"]
+    assert (await client.get("/devices/socket")).status_code == 404
+    assert "socket" not in [d["id"] for d in (await client.get("/devices")).json()["devices"]]
+    assert (await client.get(f"/rooms/{room['id']}")).json()["device_ids"] == ["bulb"]
+    assert (await client.get(f"/groups/{group['id']}")).json()["device_ids"] == ["white"]
+    cleaned = (await client.get(f"/scenes/{scene_id}")).json()
+    assert cleaned["assignments"] == {"bulb": 0} and cleaned["switches"] == {"white": False}
+    assert (await client.get("/buttons")).json() == []  # it drove the removed socket
+
+
+async def test_remove_device_drops_its_own_button_mappings(client):
+    body = {"device_id": "button", "event": "on_off.toggle", "action": {"type": "toggle", "device_id": "socket"}}
+    await client.put("/buttons", json=body)
+    assert (await client.delete("/devices/button")).status_code == 204
+    assert (await client.get("/buttons")).json() == []
+
+
+async def test_remove_cleans_what_the_radio_no_longer_knows(client):
+    await client.post("/rooms", json={"name": "Attic", "device_ids": ["ghost"]})
+    assert (await client.delete("/devices/ghost")).status_code == 204
+    rooms = (await client.get("/rooms")).json()
+    assert [r["device_ids"] for r in rooms if r["name"] == "Attic"] == [[]]

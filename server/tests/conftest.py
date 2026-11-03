@@ -48,6 +48,7 @@ class FakeCoordinator(BaseCoordinator):
         self.unreachable: set[str] = set()
         self.started = False
         self.permit_seconds: int | None = None
+        self.removed: list[str] = []
 
     async def start(self) -> None:
         self.started = True
@@ -64,6 +65,10 @@ class FakeCoordinator(BaseCoordinator):
 
     def owns(self, device_id: str) -> bool:
         return device_id in self.devices
+
+    async def remove_device(self, device_id: str) -> None:
+        self.removed.append(device_id)
+        self.devices.pop(device_id, None)
 
     async def permit_join(self, seconds: int) -> None:
         self.permit_seconds = seconds
@@ -98,7 +103,7 @@ class FakeCoordinator(BaseCoordinator):
 
 @pytest.fixture
 def settings(tmp_path) -> Settings:
-    return Settings(data_dir=str(tmp_path), enable_zigbee=False, restore_animations=False, _env_file=None)
+    return Settings(data_dir=str(tmp_path), enable_z=False, restore_animations=False, _env_file=None)
 
 
 @pytest.fixture

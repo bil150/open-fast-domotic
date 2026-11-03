@@ -1,9 +1,9 @@
 // Guided setup of a development environment: checks the tools, installs the client and the
-// server dependencies, finds the Zigbee dongle and writes .env.local.
+// server dependencies, finds the radio dongle and sets Z_DONGLE_PATH in .env.
 //
 //   npm run setup                  asks the few questions
 //   npm run setup -- --yes         no question, takes the detected values
-//   npm run setup -- --force       rewrite an existing .env.local
+//   npm run setup -- --force       ask for the dongle again even if .env has one
 //   npm run setup -- --skip-install   only the settings
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -48,11 +48,11 @@ function findPython() {
 }
 
 // --- dongle -------------------------------------------------------------------------------------
-/** How much a port name looks like a Zigbee dongle (the usual USB-serial chips). */
+/** How much a port name looks like a radio dongle (the usual USB-serial chips). */
 const dongleScore = (label) =>
-  /CP210|Silicon Labs|CH340|CH910|FTDI|ZBDongle|Zigbee/i.test(label) ? 2 : /USB/i.test(label) ? 1 : 0;
+  /CP210|Silicon Labs|CH340|CH910|FTDI|ZBDongle/i.test(label) ? 2 : /USB/i.test(label) ? 1 : 0;
 
-/** Serial ports that look like a Zigbee dongle, best guess first. */
+/** Serial ports that look like a radio dongle, best guess first. */
 function detectPorts() {
   const ports = [];
   if (windows) {
@@ -91,18 +91,21 @@ async function chooseDongle(rl) {
 
 // --- steps --------------------------------------------------------------------------------------
 async function writeEnv() {
-  title("Settings (.env.local)");
-  const envPath = join(root, ".env.local");
-  if (existsSync(envPath) && !args.has("--force")) {
-    console.log(".env.local already exists: kept (use --force to rewrite it).");
+  title("Settings (.env)");
+  const envPath = join(root, ".env");
+  const current = existsSync(envPath) ? readFileSync(envPath, "utf8") : readFileSync(join(root, ".env.example"), "utf8");
+  if (existsSync(envPath) && /^Z_DONGLE_PATH=/m.test(current) && !args.has("--force")) {
+    console.log(".env already has a Z_DONGLE_PATH: kept (use --force to change it).");
     return;
   }
   const rl = interactive ? createInterface({ input: process.stdin, output: process.stdout }) : null;
   const port = await chooseDongle(rl);
   rl?.close();
-  const example = readFileSync(join(root, ".env.local.example"), "utf8");
-  writeFileSync(envPath, example.replace(/^Z_DONGLE_PATH=.*$/m, `Z_DONGLE_PATH=${port}`));
-  console.log(`Written: .env.local (Z_DONGLE_PATH=${port})`);
+  const line = `Z_DONGLE_PATH=${port}`;
+  writeFileSync(envPath, /^Z_DONGLE_PATH=/m.test(current) ? current.replace(/^Z_DONGLE_PATH=.*$/m, line) : `${current.trimEnd()}
+${line}
+`);
+  console.log(`Written: .env (${line})`);
 }
 
 function installDependencies(python) {
