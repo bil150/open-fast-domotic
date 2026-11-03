@@ -24,6 +24,18 @@ async def rename_device(device_id: str, body: DeviceRename, hub: HubDep) -> Devi
     return await hub.rename_device(device_id, body.name)
 
 
+@router.delete(
+    "/{device_id}",
+    status_code=204,
+    summary="Remove a device from the network and forget it",
+    description="The device is asked to leave the network, then its name, room and group places, scene "
+    "settings, buttons and animation are deleted. Pair it again to get it back. A device the radio no longer "
+    "knows is cleaned from the database too.",
+)
+async def remove_device(device_id: str, hub: HubDep) -> None:
+    await hub.remove_device(device_id)
+
+
 @router.patch("/{device_id}/light", summary="Power, brightness, color or white")
 async def set_light(device_id: str, body: LightRequest, hub: HubDep) -> DeviceOut:
     command = body.to_command()

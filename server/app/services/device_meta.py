@@ -18,6 +18,12 @@ class DeviceMetaService:
     def get(self, device_id: str) -> Json:
         return self._cache.get(device_id, {})
 
+    async def forget(self, device_id: str) -> None:
+        self._cache.pop(device_id, None)
+        async with self._sessions() as session:
+            await DeviceMetaRepository(session).delete(device_id)
+            await session.commit()
+
     async def save(self, device_id: str, data: Json) -> None:
         self._cache[device_id] = data
         async with self._sessions() as session:

@@ -10,7 +10,7 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 
-# local state: Zigbee network key + paired devices, databases, logs
+# local state: radio network key + paired devices, databases, logs
 .env
 server/persistence/*
 !server/persistence/.gitkeep
@@ -29,8 +29,6 @@ Thumbs.db
 # env files (keep the examples)
 .env.*
 !.env.example
-!.env.local.example
-!.env.development
 
 # test / build artefacts
 coverage/
@@ -43,7 +41,7 @@ htmlcov/
 *.bak
 *.tmp
 
-# backups and exports: they hold the Zigbee network key (sh docker.sh backup, zigpy network export)
+# backups and exports: they hold the radio network key (sh docker.sh backup, zigpy network export)
 *.tgz
 ofd-backup-*
 network*.json

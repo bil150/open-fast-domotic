@@ -2,20 +2,23 @@
 name: open-fast-domotic
 
 services:
-  # the API, the only one to talk to the Zigbee dongle
+  # the API, the only one to talk to the radio dongle
   server:
     container_name: open-fast-domotic-server
     build: ./server
     restart: unless-stopped
     devices:
-      # host device of the Zigbee dongle (find it with: ls /dev/ttyUSB* /dev/ttyACM*)
+      # host device of the radio dongle (find it with: ls /dev/ttyUSB* /dev/ttyACM*)
       - "${Z_DONGLE_DEVICE:-/dev/ttyUSB0}:/dev/ttyUSB0"
-    # the .env next to this file, as is (see .env.example). .env.local is not loaded: it is for the dev machine
+    # the .env next to this file, as is (see .env.example)
     env_file:
       - path: .env
         required: false
+    environment:
+      # the dongle is always this one in the container, whatever the Z_DONGLE_PATH of the .env (the dev machine's port)
+      Z_DONGLE_PATH: /dev/ttyUSB0
     volumes:
-      # Zigbee network key + paired devices, the server database and its log
+      # radio network key + paired devices, the server database and its log
       - data:/data
 
   # the web application, and the entry point: http://localhost:8000

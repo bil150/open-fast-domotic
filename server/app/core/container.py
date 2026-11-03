@@ -9,6 +9,7 @@ from app.db.session import SessionFactory, create_engine, create_session_factory
 from app.protocols.base import BaseCoordinator
 from app.services.animations import AnimationService
 from app.services.buttons import ButtonService
+from app.services.device_cleanup import DeviceCleanup
 from app.services.device_meta import DeviceMetaService
 from app.services.hub import Hub
 from app.services.scenes import SceneService
@@ -61,14 +62,15 @@ def build_container(settings: Settings, coordinators: list[BaseCoordinator] | No
     hub = Hub(sessions)
     if coordinators is None:
         coordinators = []
-        if settings.enable_zigbee:
-            from app.protocols.zigbee.coordinator import ZigbeeCoordinator
+        if settings.enable_z:
+            from app.protocols.z.coordinator import ZCoordinator
 
-            coordinators.append(ZigbeeCoordinator(settings, meta))
+            coordinators.append(ZCoordinator(settings, meta))
     for coordinator in coordinators:
         hub.register(coordinator)
 
     animations = AnimationService(sessions, hub)
+    DeviceCleanup(sessions, hub, meta, animations)  # registers itself with the hub
     rooms = RoomService(sessions, hub)
     groups = GroupService(sessions, hub)
     scenes = SceneService(sessions, hub, rooms, groups)

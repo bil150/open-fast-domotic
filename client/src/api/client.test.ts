@@ -57,6 +57,7 @@ test("a failing request throws an ApiError with the server's message", async () 
 test("204 answers resolve to undefined", async () => {
   mockFetch(204);
   await expect(api.scenes.remove(1)).resolves.toBeUndefined();
+  await expect(api.devices.remove("a4:c1")).resolves.toBeUndefined();
 });
 
 test("scenes.apply returns the per-device results", async () => {

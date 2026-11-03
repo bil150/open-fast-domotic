@@ -4,7 +4,7 @@ import { applyLiveMessage } from "./useDevices";
 
 const device = (id: string, overrides: Partial<Device> = {}): Device => ({
   id,
-  protocol: "zigbee",
+  protocol: "z",
   name: id,
   model: "m",
   manufacturer: "x",

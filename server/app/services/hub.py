@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 EventHandler = Callable[[DeviceEvent], Awaitable[None] | None]
 # called before a command is sent: (device_id, source). source is "user" or "animation"
 CommandGuard = Callable[[str, str], Awaitable[None]]
+# called once a device is removed, to forget everything kept about it: (device_id)
+RemovalHandler = Callable[[str], Awaitable[None]]
 
 
 class Hub:
@@ -27,6 +29,7 @@ class Hub:
         self.coordinators: list[BaseCoordinator] = []
         self._event_handlers: list[EventHandler] = []
         self._command_guards: list[CommandGuard] = []
+        self._removal_handlers: list[RemovalHandler] = []
         self._ws_queues: set[asyncio.Queue[Json]] = set()
 
     # --- wiring -------------------------------------------------------------
@@ -39,6 +42,9 @@ class Hub:
 
     def add_command_guard(self, guard: CommandGuard) -> None:
         self._command_guards.append(guard)
+
+    def add_removal_handler(self, handler: RemovalHandler) -> None:
+        self._removal_handlers.append(handler)
 
     # --- lifecycle ----------------------------------------------------------
     async def start(self) -> None:
@@ -94,6 +100,18 @@ class Hub:
                 await repository.delete(device_id)
             await session.commit()
         return await self.get_device(device_id)
+
+    async def remove_device(self, device_id: str) -> None:
+        """Take the device off its network, then forget it everywhere (names, rooms, groups, scenes, buttons...).
+        It also cleans what is left of a device the radio no longer knows, so it is never an error."""
+        for coordinator in self.coordinators:
+            if coordinator.owns(device_id):
+                await coordinator.remove_device(device_id)
+        for handler in self._removal_handlers:
+            try:
+                await handler(device_id)
+            except Exception:
+                logger.exception("Could not forget %s", device_id)
 
     async def refresh_device(self, device_id: str) -> DeviceOut:
         device = await self._coordinator_for(device_id).refresh(device_id)

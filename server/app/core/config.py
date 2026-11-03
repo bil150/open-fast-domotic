@@ -4,11 +4,9 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# The .env at the root of the project is shared with docker compose and the client. The .env.local next to it
-# (not committed) is for the machine the server is developed on: its dongle port, its data folder. It comes
-# after, and so does a .env in the folder the server is started from: the last one wins.
+# The one .env, at the root of the project: shared with docker compose and the client.
 ROOT = Path(__file__).resolve().parents[3]
-ENV_FILES = (ROOT / ".env", ROOT / ".env.local", ".env")
+ENV_FILES = (ROOT / ".env",)
 
 
 def in_container() -> bool:
@@ -23,14 +21,14 @@ class Settings(BaseSettings):
 
     z_dongle_path: str = "/dev/ttyUSB0"
     z_dongle_baudrate: int = 115200
-    # zigpy database (Zigbee network key + paired devices). Historical name and
+    # zigpy database (radio network key + paired devices). Historical name and
     # variable kept so that an existing network is not re-formed.
     db_path: str = ""
     # Folder holding every file written by the server (databases, logs). Default: /data in a container,
     # ./persistence elsewhere.
     data_dir: str = ""
-    # Start the Zigbee radio. Disabled by the tests, which use a fake coordinator.
-    enable_zigbee: bool = True
+    # Start the radio. Disabled by the tests, which use a fake coordinator.
+    enable_z: bool = True
     # Resume the light animations that were running before a restart.
     restore_animations: bool = True
     cors_origins: str = "*"
@@ -48,7 +46,7 @@ class Settings(BaseSettings):
         return "/data" if in_container() else "./persistence"
 
     @property
-    def zigbee_db_path(self) -> str:
+    def z_db_path(self) -> str:
         return self.db_path or os.path.join(self.data_path, "app.db")
 
     @property

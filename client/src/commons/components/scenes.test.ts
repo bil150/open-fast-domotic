@@ -6,7 +6,7 @@ import { describeSteps } from "./CSequencesPanel";
 
 const bulb: Device = {
   id: "bulb",
-  protocol: "zigbee",
+  protocol: "z",
   name: "Bulb",
   model: "M",
   manufacturer: "ACME",

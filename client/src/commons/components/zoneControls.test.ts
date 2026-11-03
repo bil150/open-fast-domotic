@@ -4,7 +4,7 @@ import { anyOn, averageBrightness } from "./CLightsControls";
 
 const device = (capabilities: string[], state: Device["state"]): Device => ({
   id: "d",
-  protocol: "zigbee",
+  protocol: "z",
   name: "D",
   model: "M",
   manufacturer: "ACME",

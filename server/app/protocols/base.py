@@ -1,6 +1,6 @@
 """Protocol-agnostic building blocks.
 
-Every protocol (Zigbee today, others later) implements `BaseCoordinator`. The rest
+Every protocol (one today, others later) implements `BaseCoordinator`. The rest
 of the server (REST routes, scenes, scheduler, buttons, WebSocket) only talks to
 the `Hub`, which only talks to `BaseCoordinator`.
 """
@@ -137,6 +137,10 @@ class BaseCoordinator(ABC):
 
     @abstractmethod
     def owns(self, device_id: str) -> bool: ...
+
+    @abstractmethod
+    async def remove_device(self, device_id: str) -> None:
+        """Take the device off the network (it is asked to leave) and forget it."""
 
     @abstractmethod
     async def permit_join(self, seconds: int) -> None: ...

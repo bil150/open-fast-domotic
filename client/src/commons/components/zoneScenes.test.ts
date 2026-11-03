@@ -4,7 +4,7 @@ import { assignmentsAfterRemoval, colorFromSwatch, cssColor, swatchFromColor, ta
 
 const device = (capabilities: string[]): Device => ({
   id: "d",
-  protocol: "zigbee",
+  protocol: "z",
   name: "D",
   model: "M",
   manufacturer: "ACME",

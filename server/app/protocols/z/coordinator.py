@@ -38,7 +38,7 @@ INVALID_TEMPERATURE = -32768  # ZCL "unknown" marker (0x8000)
 class _ClusterListener:
     """zigpy calls these when a cluster receives a report or a command."""
 
-    def __init__(self, coordinator: "ZigbeeCoordinator", ieee: str, cluster: Any) -> None:
+    def __init__(self, coordinator: "ZCoordinator", ieee: str, cluster: Any) -> None:
         self.coordinator = coordinator
         self.ieee = ieee
         self.cluster = cluster
@@ -50,8 +50,8 @@ class _ClusterListener:
         self.coordinator._on_cluster_command(self.ieee, self.cluster, command_id, args)
 
 
-class ZigbeeCoordinator(BaseCoordinator):
-    protocol = "zigbee"
+class ZCoordinator(BaseCoordinator):
+    protocol = "z"
 
     def __init__(self, settings: Settings, meta: DeviceMetaService) -> None:
         super().__init__()
@@ -64,6 +64,7 @@ class ZigbeeCoordinator(BaseCoordinator):
         self._listening: set[tuple[str, int, int, str]] = set()
         self._lamps: dict[str, asyncio.Lock] = {}
         self._discovery_until = 0.0
+        self._removed: set[str] = set()  # asked to leave: zigpy drops them from its list a few seconds later
         self.last_error: str | None = None
 
     # --- lifecycle ----------------------------------------------------------
@@ -83,14 +84,14 @@ class ZigbeeCoordinator(BaseCoordinator):
         from zigpy_znp.zigbee.application import ControllerApplication
 
         logger.info(
-            "Starting the Zigbee radio on %s (%s baud)",
+            "Starting the radio on %s (%s baud)",
             self.settings.z_dongle_path,
             self.settings.z_dongle_baudrate,
         )
         try:
             self.app = await ControllerApplication.new(
                 {
-                    "database_path": self.settings.zigbee_db_path,
+                    "database_path": self.settings.z_db_path,
                     "device": {
                         "path": self.settings.z_dongle_path,
                         "baudrate": self.settings.z_dongle_baudrate,
@@ -102,14 +103,14 @@ class ZigbeeCoordinator(BaseCoordinator):
         except Exception as e:
             self.app = None
             self.last_error = str(e) or type(e).__name__
-            logger.error("Zigbee radio unavailable: %s (retry in %ss)", self.last_error, RADIO_RETRY_DELAY)
+            logger.error("radio unavailable: %s (retry in %ss)", self.last_error, RADIO_RETRY_DELAY)
             return False
 
         self.last_error = None
         self.app.add_listener(self)
         for zdev in self._zigpy_devices():
             self._attach_listeners(zdev)
-        logger.info("Zigbee radio ready, %d device(s) known", len(self._zigpy_devices()))
+        logger.info("radio ready, %d device(s) known", len(self._zigpy_devices()))
         self.spawn(self._probe_all())
         return True
 
@@ -123,6 +124,7 @@ class ZigbeeCoordinator(BaseCoordinator):
     # --- zigpy application callbacks ----------------------------------------
     def device_joined(self, device: Any) -> None:
         logger.info("Device joined: %s", device.ieee)
+        self._removed.discard(str(device.ieee))
 
     def device_initialized(self, device: Any) -> None:
         self._attach_listeners(device)
@@ -143,7 +145,7 @@ class ZigbeeCoordinator(BaseCoordinator):
     def _zigpy_devices(self) -> list[Any]:
         if not self.app:
             return []
-        return [d for d in self.app.devices.values() if d.nwk != 0x0000]
+        return [d for d in self.app.devices.values() if d.nwk != 0x0000 and str(d.ieee) not in self._removed]
 
     def _find(self, device_id: str) -> Any:
         for zdev in self._zigpy_devices():
@@ -153,6 +155,20 @@ class ZigbeeCoordinator(BaseCoordinator):
 
     def owns(self, device_id: str) -> bool:
         return self._find(device_id) is not None
+
+    async def remove_device(self, device_id: str) -> None:
+        """zigpy tells the device to leave (a sleeping one may not hear it) and deletes it from its own
+        database either way. It is hidden at once, zigpy needs up to 30 s to drop it from its list."""
+        zdev = self._find(device_id)
+        if zdev is None:
+            return
+        ieee = str(zdev.ieee)
+        self._removed.add(ieee)
+        self._state.pop(ieee, None)
+        self._online.pop(ieee, None)
+        self._lamps.pop(ieee, None)
+        await self.app.remove(zdev.ieee)
+        logger.info("Device removed: %s", ieee)
 
     def _zdevice(self, zdev: Any) -> ZDevice:
         return ZDevice(zdev, self.meta.get(str(zdev.ieee)))
@@ -389,7 +405,7 @@ class ZigbeeCoordinator(BaseCoordinator):
     # --- commands -----------------------------------------------------------
     async def permit_join(self, seconds: int) -> None:
         if not self.app:
-            raise RadioNotReadyError("The Zigbee radio is not ready (dongle unplugged or busy?)")
+            raise RadioNotReadyError("The radio is not ready (dongle unplugged or busy?)")
         await self.app.permit(seconds)
         self._discovery_until = time.monotonic() + seconds
         logger.info("Pairing allowed for %ss", seconds)
